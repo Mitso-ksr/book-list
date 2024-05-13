@@ -3,6 +3,6 @@ import booksReducer from './booksReducer.js'
 
 export default configureStore({
   reducer: {
-    counter: booksReducer
+    books: booksReducer
   }
 })
