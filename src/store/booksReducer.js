@@ -46,11 +46,18 @@ export const booksSlice = createSlice({
         },
         eraseBook: (books, action) => {
             return books.filter(book => book.id != action.payload)
+        },
+        toggleRead: (books, action) => {
+            books.forEach(book => {
+                if (book.id == action.payload) {
+                    book.isRead = !book.isRead
+                }
+            })
         }
     }
 })
 
-export const { addBook, eraseBook } = booksSlice.actions
+export const { addBook, eraseBook, toggleRead } = booksSlice.actions
 export const selectBooks = state => state.books
 
 export default booksSlice.reducer

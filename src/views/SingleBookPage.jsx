@@ -1,7 +1,7 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Notes from '../components/Notes.jsx'
 import { useSelector, useDispatch } from 'react-redux';
-import { selectBooks, eraseBook } from '../store/booksReducer.js';
+import { selectBooks, eraseBook, toggleRead } from '../store/booksReducer.js';
 
 function SingleBookPage() {
   const { id } = useParams()
@@ -16,6 +16,10 @@ function SingleBookPage() {
       dispatch(eraseBook(id))
       navigate('/')
     }
+  }
+  
+  function handleToggleRead(id) {
+    dispatch(toggleRead(id))
   }
 
   return (
@@ -39,7 +43,7 @@ function SingleBookPage() {
                 <h4 className="book-author">{book.author}</h4>
                 <p>{book.synopsis}</p>
                 <div className="read-checkbox">
-                  <input type="checkbox" defaultChecked={book.isRead} />
+                  <input type="checkbox" defaultChecked={book.isRead} onClick={() => handleToggleRead(book.id)} />
                   <label>{book.isRead ? "Already Read It" : "Haven't Read it yet"}</label>
                 </div>
                 <div className="erase-book" onClick={() => handleEraseBook(book.id)}>
