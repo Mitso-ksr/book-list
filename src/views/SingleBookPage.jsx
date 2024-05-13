@@ -1,4 +1,4 @@
-import { useParams } from 'react-router';
+import { useParams, Link } from 'react-router-dom';
 import Notes from '../components/Notes.jsx'
 
 function SingleBookPage() {
@@ -47,9 +47,11 @@ function SingleBookPage() {
     return (
       <>
         <div className="container">
-                <button className="btn">
+              <Link to='/'>
+              <button className="btn">
                     ← Back to Books
                 </button>
+              </Link>
             
             <div className="single-book">
                     <div className="book-cover">
