@@ -130,7 +130,6 @@ input:focus {
   font-size: 18px;
   font-family: inherit;
 }
-
 .btn:focus {
   outline: none;
 }
