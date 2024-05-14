@@ -37,7 +37,6 @@ function LoginPage() {
         [e.target.name]: e.target.value,
       };
     });
-    console.log(userCredentials);
   }
 
   function handleSignup(e) {
@@ -58,8 +57,6 @@ function LoginPage() {
         // ...
       })
       .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
         setError(error.message);
       });
   }
@@ -75,21 +72,16 @@ function LoginPage() {
       .then((userCredential) => {
         // Signed in
         const user = userCredential.user;
-        console.log(user);
         dispatch(setUser({
           id: user.uid,
           email: user.email
         }))
-        // ...
       })
       .catch((error) => {
         setError(error.message);
       });
   }
 
-  function handlePasswordReset() {
-    sendPasswordResetEmail;
-  }
 
   return (
     <>

@@ -5,7 +5,6 @@ import {
     sendPasswordResetEmail
   } from "firebase/auth";
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 
 function ResetPasswordPage() {
