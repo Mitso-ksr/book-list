@@ -12,7 +12,7 @@ import { useDispatch } from "react-redux";
 import { setUser } from "../store/usersSlice.js";
 
 function LoginPage() {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [loginType, setLoginType] = useState("login");
   const [userCredentials, setUserCredentials] = useState({});
   const [error, setError] = useState("");
@@ -27,6 +27,10 @@ function LoginPage() {
     } else {
       // User is signed out
       // ...
+    }
+    if (isLoading) {
+
+      setIsLoading(false)
     }
   });
 
