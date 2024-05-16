@@ -18,12 +18,14 @@ function App() {
         <Route index element={<BooksPage />} />
         <Route path="add-book" element={<AddBookPage />} />
         <Route path="book/:id" element={<SingleBookPage />} />
+        <Route path='*' element={<h1>hello world</h1>} />
       </Routes>
     </BrowserRouter> : 
     <BrowserRouter>
       <Routes>
         <Route index element={<LoginPage />} />
         <Route path='reset-password' element = {<ResetPasswordPage />} />
+        <Route path='*' element={<h1>hello world</h1>} />
       </Routes>
     </BrowserRouter>
     }
