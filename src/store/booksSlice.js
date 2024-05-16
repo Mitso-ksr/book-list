@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { collection, query, where, getDocs, doc, updateDoc, deleteDoc } from "firebase/firestore";
+import { collection, query, where, getDocs, doc, updateDoc, deleteDoc, addDoc } from "firebase/firestore";
 import { db, auth } from "../firebase/config.js";
 
 export const booksSlice = createSlice({
@@ -9,22 +9,13 @@ export const booksSlice = createSlice({
     status: "idle",
   },
   reducers: {
-    addBook: (books, action) => {
-      let newBook = action.payload;
-      newBook.id = books.length
-        ? Math.max(...books.map((book) => book.id)) + 1
-        : 1;
-      books.push(newBook);
-    },
-    // eraseBook: (books, action) => {
-    //   return books.filter((book) => book.id != action.payload);
+    // addBook: (books, action) => {
+    //   let newBook = action.payload;
+    //   newBook.id = books.length
+    //     ? Math.max(...books.map((book) => book.id)) + 1
+    //     : 1;
+    //   books.push(newBook);
     // },
-    // toggleRead: (books, action) => {
-    //   books.map((book) => {
-    //     if (book.id == action.payload) {
-    //       book.isRead = !book.isRead;
-    //     }
-    //   });
     },
     extraReducers(builder) {
       builder
@@ -51,15 +42,29 @@ export const booksSlice = createSlice({
           console.log(action.error.message) 
         })
         .addCase(eraseBook.fulfilled, (state, action) => {
-          return state.books.filter(book => book.id != action )
+          state.books = state.books.filter(book => book.id != action.payload )
+          state.status = 'succeeded'
         })
+        .addCase(eraseBook.pending, (state, action) => {
+          state.status = 'loading'        })
         .addCase(eraseBook.rejected, (state, action) => {
+          state.status = 'failed'
+          console.log(action.error.message) 
+        })
+        .addCase(addBook.fulfilled, (state, action) => {
+          state.status = 'succeeded'
+          state.books.push(action.payload)
+        })
+        .addCase(addBook.pending, (state, action) => {
+          state.status = 'loading'
+        })
+        .addCase(addBook.rejected, (state, action) => {
+          state.status = 'failed'
           console.log(action.error.message) 
         })
   },
   });
 
-export const { addBook } = booksSlice.actions;
 
 export const selectBooks = (state) => state.books;
 
@@ -87,9 +92,15 @@ export const toggleRead = createAsyncThunk("books/toggleRead", async(payload) =>
 })
 
 export const eraseBook = createAsyncThunk("books/eraseBook", async(payload) => {
-  const bookRef = doc(db, "books", payload)
-  await deleteDoc(bookRef)
+  await deleteDoc(doc(db, "books", payload));
+  return payload;
+})
 
-  return payload
-
+export const addBook = createAsyncThunk("books/addBook", async(payload) => {
+  const collectionRef = collection(db, "books");
+  let newBook = payload;
+  newBook.user_id = auth.currentUser.uid;
+  const docRef = await addDoc(collectionRef, newBook)
+  newBook.id = docRef.id
+  return newBook
 })

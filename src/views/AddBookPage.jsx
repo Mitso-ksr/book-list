@@ -20,9 +20,16 @@ function AddBookPage() {
         }
 
         if (newBook.title && newBook.cover && newBook.author) {
-            dispatch(addBook(newBook));
-            alert('Book created successfully!');
-            navigate("/");
+            dispatch(addBook(newBook)).then((res) => {
+                if (res.error) {
+                    alert("something went wrong")
+                }
+                else {
+                    alert("book created succesfully")
+                    navigate("/")
+                }
+            })
+
         } else {
             alert('Please fill the mandatory fields.');
         }

@@ -3,6 +3,7 @@ import Header from "../components/Header.jsx";
 import { useSelector, useDispatch } from "react-redux";
 import { selectBooks, fetchBooks } from "../store/booksSlice.js";
 import { useEffect } from "react";
+import { useState } from "react";
 
 
 function BooksPage() {
@@ -23,9 +24,13 @@ function BooksPage() {
         <Header pageTitle={pageTitle} />
         <div className="books-container">
           <div className="books-list">
-            {books.map((book) => (
-              <Book key={book.id} book={book} />
-            ))}
+            {
+              books.status == 'loading' ? 
+              <h3>Loading ...</h3>  :
+              books.map((book) => (
+                <Book key={book.id} book={book} />
+              ))
+            }
           </div>
         </div>
       </div>
