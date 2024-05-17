@@ -12,7 +12,7 @@ function SingleBookPage() {
   const navigate = useNavigate();
   const bookStatus = useSelector(selectBooks).status;
   const [book, setBook] = useState("");
-  const[fetchStatus, setFetchStatus] = useState("idle");
+  const [fetchStatus, setFetchStatus] = useState("idle");
 
   function handleEraseBook(id) {
     if (
@@ -27,13 +27,11 @@ function SingleBookPage() {
   }
 
   function handleToggleRead(info) {
-    dispatch(
-      toggleRead({ id: info.id, isRead: info.isRead })
-    );
+    dispatch(toggleRead({ id: info.id, isRead: info.isRead }));
     setBook({
       ...book,
-      isRead: !info.isRead
-    })
+      isRead: !info.isRead,
+    });
   }
 
   const { id } = useParams();
@@ -51,15 +49,15 @@ function SingleBookPage() {
         // docSnap.data() will be undefined in this case
         console.log("No such document!");
       }
-      setFetchStatus("success")
+      setFetchStatus("success");
     } catch (error) {
       console.log(error);
-      setFetchStatus("failed")
+      setFetchStatus("failed");
     }
-  }
+  };
 
-  useEffect( () => {
-  fetchBook(id);
+  useEffect(() => {
+    fetchBook(id);
   }, []);
 
   return (
@@ -72,53 +70,54 @@ function SingleBookPage() {
         {book ? (
           <div>
             <div className="single-book">
-              {bookStatus == "loading" ? (
-                <h3>Loading...</h3>
-              ) : (
-                <>
-                  <div className="book-cover">
-                    <img src={book.cover} />
-                  </div>
+              <>
+                <div className="book-cover">
+                  <img src={book.cover} />
+                </div>
 
-                  <div className="book-details">
-                    <h3 className="book-title">{book.title}</h3>
-                    <h4 className="book-author">{book.author}</h4>
-                    <p>{book.synopsis}</p>
-                    <div className="read-checkbox">
-                      <input
-                        onClick={() => {
-                            handleToggleRead({ id: book.id, isRead: book.isRead })
-                        }}
-                        type="checkbox"
-                        defaultChecked={book.isRead}
-                      />
-                      <label>
-                        {book.isRead
-                          ? "Already Read It"
-                          : "Haven't Read it yet"}
-                      </label>
-                    </div>
-                    <div
-                      onClick={() => handleEraseBook(book.id)}
-                      className="erase-book"
-                    >
-                      Erase book
-                    </div>
+                <div className="book-details">
+                  <h3 className="book-title">{book.title}</h3>
+                  <h4 className="book-author">{book.author}</h4>
+                  <p>{book.synopsis}</p>
+                  <div className="read-checkbox">
+                    <input
+                      onClick={() => {
+                        handleToggleRead({ id: book.id, isRead: book.isRead });
+                      }}
+                      type="checkbox"
+                      defaultChecked={book.isRead}
+                    />
+                    <label>
+                      {book.isRead ? "Already Read It" : "Haven't Read it yet"}
+                    </label>
                   </div>
-                </>
-              )}
+                  <div
+                    onClick={() => handleEraseBook(book.id)}
+                    className="erase-book"
+                  >
+                    Erase book
+                  </div>
+                </div>
+              </>
             </div>
 
             <Notes bookId={id} />
           </div>
-        ) : (
+        ) : fetchStatus == 'success' ?
+       ( <p>Error while fetching the book</p>) :
+       fetchStatus == "failed" ?
+         (
           <div>
             <p>
               Book not found. Click the button above to go back to the list of
               books.
             </p>
           </div>
-        )}
+        ):
+        (
+          <p>Loading...</p>
+        ) 
+        }
       </div>
     </>
   );
