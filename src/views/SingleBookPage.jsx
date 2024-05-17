@@ -2,7 +2,6 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import Notes from "../components/Notes.jsx";
 import { useSelector, useDispatch } from "react-redux";
 import { selectBooks, eraseBook, toggleRead } from "../store/booksSlice.js";
-import { eraseBookNotes } from "../store/notesSlice.js";
 import { getDoc, doc } from "firebase/firestore";
 import { db } from "../firebase/config.js";
 import { useState, useEffect } from "react";
@@ -21,7 +20,6 @@ function SingleBookPage() {
       )
     ) {
       dispatch(eraseBook(id));
-      dispatch(eraseBookNotes(id));
       navigate("/");
     }
   }

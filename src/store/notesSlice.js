@@ -35,10 +35,6 @@ export const notesSlice = createSlice({
       state.status = 'succeeded'
       state.notes = state.notes.filter(note => note.id != action.payload)
     })
-    .addCase(eraseBookNotes.fulfilled, (state, action) => {
-      state.status = "succeeded";
-      state.notes = state.notes.filter(note => note.book_id != action.payload)
-    })
 
   }
 })
@@ -75,11 +71,4 @@ export const addNote = createAsyncThunk("notes/addNote" , async(payload) => {
 export const eraseNote = createAsyncThunk("notes/eraseNote" , async(payload) => {
   await deleteDoc(doc(db, 'notes', payload))
   return payload
-})
-
-
-export const eraseBookNotes = createAsyncThunk("notes/eraseBookNotes", async(payload) => {
-  console.log("erasebooknotes fired")
-  const collectionRef = collection(db, 'notes')
-  
 })
