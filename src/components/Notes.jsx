@@ -1,16 +1,27 @@
 
 import {useSelector, useDispatch} from 'react-redux';
-import {selectNotes, eraseNote, addNote} from '../store/notesSlice.js';
+import {selectNotes, eraseNote, addNote, fetchNotes} from '../store/notesSlice.js';
+import { useEffect } from 'react';
+import { addDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '../firebase/config';
 
 function Notes({bookId}) {
-    
-    const dispatch = useDispatch();
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (notesStatus == "idle") {
+      dispatch(fetchNotes(bookId));
+    }
+  }, []);
+
+
+
     
     function handleEraseNote(id) {
       if(confirm('Are you sure you want to erase this note?')) {
         dispatch(eraseNote(id));
       }
     }
+    const notesStatus = useSelector(selectNotes).status
 
     function handleAddNote(e) {
       e.preventDefault();
@@ -30,7 +41,7 @@ function Notes({bookId}) {
 
   }
 
-    const notes = useSelector(selectNotes).filter(note => note.book_id == bookId);
+    const notes = useSelector(selectNotes).notes.filter(note => note.book_id == bookId)
     
     return (
       <>

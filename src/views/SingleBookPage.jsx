@@ -2,12 +2,17 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import Notes from "../components/Notes.jsx";
 import { useSelector, useDispatch } from "react-redux";
 import { selectBooks, eraseBook, toggleRead } from "../store/booksSlice.js";
-import { eraseBookNotes } from "../store/notesSlice.js";
+import { getDoc, doc } from "firebase/firestore";
+import { db } from "../firebase/config.js";
+import { useState, useEffect } from "react";
 
 function SingleBookPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const bookStatus = useSelector(selectBooks).status;
+  const [book, setBook] = useState("");
+  const [fetchStatus, setFetchStatus] = useState("idle");
+
   function handleEraseBook(id) {
     if (
       confirm(
@@ -15,16 +20,43 @@ function SingleBookPage() {
       )
     ) {
       dispatch(eraseBook(id));
-      dispatch(eraseBookNotes(id));
       navigate("/");
     }
   }
 
+  function handleToggleRead(info) {
+    dispatch(toggleRead({ id: info.id, isRead: info.isRead }));
+    setBook({
+      ...book,
+      isRead: !info.isRead,
+    });
+  }
+
   const { id } = useParams();
 
-  const books = useSelector(selectBooks).books;
+  const fetchBook = async (book_id) => {
+    try {
+      const docRef = doc(db, "books", book_id);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        setBook({
+          ...docSnap.data(),
+          id: docSnap.id,
+        });
+      } else {
+        // docSnap.data() will be undefined in this case
+        console.log("No such document!");
+      }
+      setFetchStatus("success");
+    } catch (error) {
+      console.log(error);
+      setFetchStatus("failed");
+    }
+  };
 
-  const book = books.filter((book) => book.id == id)[0];
+  useEffect(() => {
+    fetchBook(id);
+  }, []);
 
   return (
     <>
@@ -36,55 +68,54 @@ function SingleBookPage() {
         {book ? (
           <div>
             <div className="single-book">
-              {bookStatus == "loading" ? (
-                <h3>Loading...</h3>
-              ) : (
-                <>
-                  <div className="book-cover">
-                    <img src={book.cover} />
-                  </div>
+              <>
+                <div className="book-cover">
+                  <img src={book.cover} />
+                </div>
 
-                  <div className="book-details">
-                    <h3 className="book-title">{book.title}</h3>
-                    <h4 className="book-author">{book.author}</h4>
-                    <p>{book.synopsis}</p>
-                    <div className="read-checkbox">
-                      <input
-                        onClick={() => {
-                          dispatch(
-                            toggleRead({ id: book.id, isRead: book.isRead })
-                          );
-                        }}
-                        type="checkbox"
-                        defaultChecked={book.isRead}
-                      />
-                      <label>
-                        {book.isRead
-                          ? "Already Read It"
-                          : "Haven't Read it yet"}
-                      </label>
-                    </div>
-                    <div
-                      onClick={() => handleEraseBook(book.id)}
-                      className="erase-book"
-                    >
-                      Erase book
-                    </div>
+                <div className="book-details">
+                  <h3 className="book-title">{book.title}</h3>
+                  <h4 className="book-author">{book.author}</h4>
+                  <p>{book.synopsis}</p>
+                  <div className="read-checkbox">
+                    <input
+                      onClick={() => {
+                        handleToggleRead({ id: book.id, isRead: book.isRead });
+                      }}
+                      type="checkbox"
+                      defaultChecked={book.isRead}
+                    />
+                    <label>
+                      {book.isRead ? "Already Read It" : "Haven't Read it yet"}
+                    </label>
                   </div>
-                </>
-              )}
+                  <div
+                    onClick={() => handleEraseBook(book.id)}
+                    className="erase-book"
+                  >
+                    Erase book
+                  </div>
+                </div>
+              </>
             </div>
 
             <Notes bookId={id} />
           </div>
-        ) : (
+        ) : fetchStatus == 'success' ?
+       ( <p>Error while fetching the book</p>) :
+       fetchStatus == "failed" ?
+         (
           <div>
             <p>
               Book not found. Click the button above to go back to the list of
               books.
             </p>
           </div>
-        )}
+        ):
+        (
+          <p>Loading...</p>
+        ) 
+        }
       </div>
     </>
   );
